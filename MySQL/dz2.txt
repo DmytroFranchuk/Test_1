@@ -1,0 +1,26 @@
+ 1 уровень сложности: используя схему HR решите ряд задач
+
+Найти количество сотрудников в каждом департаменте. Вывести departmentid и employeescnt
+
+
+Найти количество сотрудников в каждом департаменте. Вывести departmentname и employeescnt
+
+
+Найти количество сотрудников у каждого менеджера. Вывести managerid и employeescnt
+
+
+Найти количество сотрудников у каждого менеджера. Вывести firstname,  lastname и employees_cnt
+
+
+Найти максимальную зарплату в каждом департаменте. Вывести departmentid и maxsalary
+
+
+Найти сотрудников, у которых наибольшая зарплата в их департаменте
+
+
+2 уровень сложности: 
+
+Homework archive
+
+This section contains all homework assignments that have not been completed.
+

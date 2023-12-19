@@ -1,0 +1,599 @@
+mongodb://localhost:27017/?retryWrites=true&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000
+
+Урок 3
+db.transactions.aggregate([ {  $match: { currency: 'eur' }   }, { $sort: {  amount: -1  }  }, {  $limit: 1  }  ]) 
+
+db.transactions.aggregate([
+  {
+    $match: {
+      currency: 'eur',
+      amount: { $lt: 1000 }
+    }
+  },
+  {
+    $sort: {
+      amount: -1
+    }
+  },
+  {
+    $skip: 1
+  },
+  {
+    $limit: 1
+  }
+])
+
+
+Урок 2
+https://western-appeal-39b.notion.site/GenTech-Summary-Aug-2-2023-53a7def5f84642e99e6a3774386baa31
+https://dbdiagram.io/d/64ca3e4902bd1c4a5e1d8adb
+
+db.users_1.updateOne(
+	{_id: 1},
+{$addToSet: {tag: 'admin'}}
+)
+
+{
+  _id: 1,
+  fullname: 'hacker111',
+  country: 'Germany',
+  is_blocked: false,
+  tag: [
+    'admin'
+  ]
+}
+
+
+2. Заполнить коллекцию workers 5 документами со свойствами id, firstname, lastname, age, position, salary, skills.     Используйте следующие данные:
+    1. Inga Petrova, 27, Barista, 1500, [’preparing drinks’, ‘cleaning equipment’] 
+    2. Boris Orlov, 36, Server, 2400, [’taking orders’, ‘suggesting meals’, ‘taking payments’]
+    3. Ivan Demidov, 32, Chef, 3200, [’preparing food’, ‘baking bread’]
+    4. Marina Sidorova, 22, Hostess, 1700, [’greeting guests’, ‘seating guests’, ‘answering phone calls’]
+    5. Olga Ivanova, 43, Sommelier, 2500, [’curating a wine list’, ‘creating wine pairings’]
+
+db.createCollection('workers')
+
+db.workers.insertMany([{id: 1, firstname: 'Inga', lastname: 'Petrova', age: 27, position: 'Barista', salary: 1500, skills: ['preparing drinks', 'cleaning equipment']}, {id: 2, firstname: 'Boris', lastname: 'Orlov', age: 36, position: 'Server', salary: 2400, skills: ['taking orders', 'suggesting meals','taking payments']}, {id: 3, firstname: 'Ivan', lastname: 'Demidov', age: 32, position: 'Chef', salary: 3200, skills: ['preparing food', 'baking bread']}, {id: 4, firstname: 'Marina', lastname: 'Sidorova', age: 22, position: 'Hostess', salary: 1700, skills: ['greeting guests', 'seating guests', 'answering phone calls']}, {id: 5, firstname: 'Olga', lastname: 'Ivanova', age: 43, position: 'Sommelier', salary: 2500, skills: ['curating a wine list', 'creating wine pairings']}])
+
+
+Найти работника с ID равным 3
+db.workers.find({id: 3})
+db.workers.find({id: 3}, {firstname: 1, lastname: 1})
+
+Найти всех работников, у которых зарплата выше 2000. Вывести имя и зарплату
+db.workers.find( {salary: {$gt: 2000}}, {firstname: 1, salary: 1})
+
+Найти всех работников, у которых зарплата выше 2000 и возраст меньше 40. Вывести имя, зарплату и возраст.
+db.workers.find( {$and: [{salary: {$gt: 2000}}, {age: {$lt: 40}}]},{firstname: 1, salary: 1, age: 1})
+
+Найти всех работников с зарплатой между 1800 и 2500.
+db.workers.find({ salary: {$gte: 1800, $lte: 2500 } } )
+
+Найти всех работников, возраст которых не равен 27.
+db.workers.find({ age: {$ne: 27 } } )
+
+Найти всех работников, занимающих должность "Barista" или "Chef".
+db.workers.find({$or: [{position: 'Barista'},{position: 'Chef'}]})
+db.workers.find({position: {$in: ['Barista', 'Chef']}})
+
+Найти всех работников, умеющих "taking orders" и "taking payments".
+db.workers.find({skills: {$all: ["taking orders", "taking payments"]}})
+
+Найти всех работников, умеющих либо "baking bread" либо "preparing drinks"
+db.workers.find({skills: {$in: ["baking bread", "preparing drinks"]}})
+
+Найти всех работников, не умеющих "answering phone calls".
+db.workers.find({skills: {$ne: "answering phone calls"}})
+db.workers.find({skills: {$nin: ["answering phone calls"]}})
+
+Найти всех работников,  не умеющих  "baking bread" и "preparing drinks"
+db.workers.find({skills: {$nin: ["baking bread", "preparing drinks"]}})
+
+Изменили фамилию в документе
+updateOne и updateMany
+Часто не требуется обновлять весь документ, а только значение одного или нескольких его свойств. Для этого применяются функции updateOne() (обновляет только один документ) и updateMany() (обновляет множество документов).
+
+$set добавит поле которого нет
+db.workers.updateOne({id: 1}, {$set: {lastname: "Smit"}})
+
+Обновить должность работника с ID равным 2 на "Head Server".
+db.workers.updateOne({id: 2}, {$set: {position: "Head Server" }})
+
+У пользователя Marina Sidorova заменить возраст на 23.
+db.workers.updateOne({lastname: "Sidorova", firstname: "Marina"}, {$set: {age: 23 }})
+
+Установить возраст всех работников с зарплатой выше 2000 равным 35.
+db.workers.updateMany({salary: {$gt: 2000}}, {$set: {age: 35 }})
+db.workers.find({salary: {$gt: 2000}})
+
+Умножение
+db.workers.updateOne({id: 2}, {$mul: {age: 2 } } ) 
+db.workers.find({id: 2})
+
+Увеличить зарплату всех работников на 10%.
+db.workers.updateMany({ }, {$mul: {salary: 1.1 } } ) 
+
+Добавление нового скила поля в существующую сущность
+db.workers.updateMany({id: 1}, {$push: {skills: "drink vodka"} } ) 
+db.workers.find({id: 1})
+
+Добавить новый навык "serving desserts" работнику с ID равным 3.
+db.workers.updateOne({id: 3}, {$push: {skills: "serving desserts"} } ) 
+db.workers.find({id: 3})
+
+Удалить навык "taking payments" у всех работников.
+db.workers.updateMany({ }, {$pull: {skills: "taking payments"} } ) 
+
+$inc увеличить на указанное значение, прибавить к значению указанное
+Увеличить зарплату работника с ID равным 1 на 300.
+db.workers.updateOne({id: 1}, {$inc: {salary: 300} } ) 
+db.workers.find({id: 1})
+
+Уменьшить всем сотрудникам возраст на 4 года
+db.workers.updateMany({ }, {$inc: {age: -4} } )
+
+Переименование rename
+db.workers.updateMany({ }, 
+		      {$rename: {position: 'job'} } ) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Условные операторы
+Условные операторы задают условие, которому должно соответствовать значение поля документа:
+$eq (равно)
+$ne (не равно)
+$gt (больше чем)
+$lt (меньше чем)
+$gte (больше или равно)
+$lte (меньше или равно)
+$in определяет массив значений, одно из которых должно иметь поле документа
+$nin определяет массив значений, которые не должно иметь поле документа
+
+Логические операторы выполняются над условиями выборки:
+$or: соединяет два условия, и документ должен соответствовать одному из этих условий
+$and: соединяет два условия, и документ должен соответствовать обоим условиям
+$not: документ должен НЕ соответствовать условию
+$nor: соединяет два условия, и документ должен НЕ соответстовать обоим условиям
+
+Ряд операторов предназначены для работы с массивами:
+$all: определяет набор значений, которые должны иметься в массиве
+$size: определяет количество элементов, которые должны быть в массиве
+$elemMatch: определяет условие, которым должны соответствовать элемены в массиве
+
+
+
+
+
+
+
+
+
+
+
+gt - >
+lt - <
+gte - >=
+lte - <=
+eq - = 
+ne - <>
+
+
+
+
+
+
+
+mongodb Создать коллекцию и заполнить документами
+db.createCollection("users") 
+заполнить документами (4 штуки) со следующими свойствами (id, name, age, gender). Используйте следующие данные:
+
+1 Анатолий 28 m
+2 Светлана 25 f
+3 Никита 33 m
+4 Ольга 22 f
+db.users.insertMany([{id: 1, name: "Анатолий", age: 28, gender: "m"},{id: 2, name: "Светлана",age: 25, gender: "f"}])
+db.users.insertMany([{id: 3, name: "Никита", age: 33, gender: "m"},{id: 4, name: "Ольга",age: 22, gender: "f"}])
+
+Вывести данные о всех представительницах женского пола
+db.users.find( { gender: "f" } )
+
+Вывести данные о всех представительницах женского пола и людях старше 30 лет
+db.users.find( { $or: [ { gender: "f" }, { age: { $gt: 30 } } ] } )
+
+Вывести всех пользователей, у которых имя входит в список (Анатолий, Дмитрий, Ольга, Семен)
+db.users.find( { name: { $in: [ "Анатолий", "Дмитрий", "Ольга", "Семен" ] } } )
+
+
+Вывести пользователя с идентификатором 3
+db.users.find( { id: 3 } )
+
+Вывести пользователей в возрасте от 30 до 40 (включая концы)
+db.users.find({ age: {$gte: 30, $lte: 40 } } )
+
+
+
+
+
+
+
+db.workers.find({firstname:{$eq:'Виктор'}})
+db.workers.find({firstname:'Виктор'})
+
+db.workers.find()
+
+
+db.workers.insertMany([{id: 1, firstname: 'Петр', lastname: 'Сергеев', position: 'CEO', salary: 7000}])
+
+db.workers.insertMany([{id: 2, firstname: 'Виктор', lastname: 'Семенов', position: 'Web-developer', salary: 5000}])
+
+db.workers.insertMany([{id: 3, firstname: 'Никита', lastname: 'Петров', position: 'Assistant', salary: 3500}])
+
+db.workers.insertMany([{id: 4, firstname: 'Инна', lastname: 'Орлова', position: 'Accountant ', salary: 4500}])
+
+db.users.insertMany([{id: 3, name: 'Антон', lastname: 'Куликов', age: 30}])
+db.users.insertMany([{id: 2, name: 'Максим', lastname: 'Грибов', age: 33}])
+db.users.insertMany([{id: 1, name: 'Анатолий', lastname: 'Ушанов', age: 31}])
+db.createCollection("users")
+use tmp;
+
+вывести сотрудников, у которых зарплата больше либо равна 5000
+db.workers.find({salary:{$gte:5000}})
+
+вывести всех сотрудников, которые не являются веб разработчиками
+db.workers.find({position:{$ne: 'Web-developer'}})
+
+db.workers.find({$or: [{salary: 3500},{salary: 7000}]})
+
+вывести документы, у которых id = 3 или position = 'CEO'
+db.workers.find({$or: [{id: 3},{position: 'CEO'}]})
+
+вывести документы, в которых у сотрудника position не 'CEO' и зарплата больше 3500
+db.workers.find({$and: [{salary: {$gt:3500}},{position: {$ne: 'CEO'}}]}) или так
+db.workers.find({salary: {$gt:3500},position: {$ne: 'CEO'}})
+
+in - значения входят в массив
+nin - не входит
+db.workers.find({salary: {$in: [7000, 3500]}})
+db.workers.find({salary: {$nin: [7000, 3500]}})
+
+вывести СЕО и веб разработчика
+db.workers.find({position: {$in: ['CEO', 'Web-developer']}})
+
+вывести сотрудников, у которых id неравен 1, 2, 4
+или зп равно 4500
+db.workers.find({$or: [{id:{$nin:[1,2,,4]}},{salary: 4500}]})
+
+
+{ 
+  name: "David",
+  lastname: "Johnson",
+  marks: [5, 5, 4, 5, 5, 5, 4, 3, 4],
+  subjects: ["Math", "Physics", "Chemistry"],
+  class: 1
+},
+{ 
+  name: "Daniel",
+  lastname: "Miller",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{ 
+  name: "James",
+  lastname: "Lee",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{ 
+  name: "Daniel",
+  lastname: "Clark",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{    
+  name: "John",
+  lastname: "Doe",
+  marks: [4, 3, 5, 4, 5, 3, 4, 4, 3, 5, 2, 5, 4],
+  subjects: ["Math", "Science", "English", "History"],
+  class: 2
+},
+{ 
+  name: "Michael",
+  lastname: "Brown",
+  marks: [2, 3, 4, 3, 4, 3, 4, 4, 4, 3, 4, 3, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Benjamin",
+  lastname: "Thompson",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Matthew",
+  lastname: "Wilson",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Isabella",
+  lastname: "Garcia",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Jane",
+  lastname: "Smith",
+  marks: [3, 4, 3, 4, 3, 4, 4, 5, 4, 4, 3],
+  subjects: ["Math", "Science", "English", "Geography", "Art"],
+  class: 3
+},  
+{ 
+  name: "Emily",
+  lastname: "Davis",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Ava",
+  lastname: "Taylor",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Sarah",
+  lastname: "Williams",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}, 
+{ 
+  name: "Olivia",
+  lastname: "Anderson",
+  marks: [4, 3, 4, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}, 
+{ 
+  name: "Sophia",
+  lastname: "Martin",
+  marks: [4, 3, 4, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}
+
+
+db.students.insertMany([{ 
+  name: "David",
+  lastname: "Johnson",
+  marks: [5, 5, 4, 5, 5, 5, 4, 3, 4],
+  subjects: ["Math", "Physics", "Chemistry"],
+  class: 1
+},
+{ 
+  name: "Daniel",
+  lastname: "Miller",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{ 
+  name: "James",
+  lastname: "Lee",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{ 
+  name: "Daniel",
+  lastname: "Clark",
+  marks: [3, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Physics", "Chemistry", "Geography"],
+  class: 1
+},
+{    
+  name: "John",
+  lastname: "Doe",
+  marks: [4, 3, 5, 4, 5, 3, 4, 4, 3, 5, 2, 5, 4],
+  subjects: ["Math", "Science", "English", "History"],
+  class: 2
+},
+{ 
+  name: "Michael",
+  lastname: "Brown",
+  marks: [2, 3, 4, 3, 4, 3, 4, 4, 4, 3, 4, 3, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Benjamin",
+  lastname: "Thompson",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Matthew",
+  lastname: "Wilson",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English"],
+  class: 2
+},
+{ 
+  name: "Isabella",
+  lastname: "Garcia",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Jane",
+  lastname: "Smith",
+  marks: [3, 4, 3, 4, 3, 4, 4, 5, 4, 4, 3],
+  subjects: ["Math", "Science", "English", "Geography", "Art"],
+  class: 3
+},  
+{ 
+  name: "Emily",
+  lastname: "Davis",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Ava",
+  lastname: "Taylor",
+  marks: [4, 5, 4, 3, 4, 5, 5, 5, 5, 4, 5],
+  subjects: ["Math", "Science", "English", "History", "Art"],
+  class: 3
+},
+{ 
+  name: "Sarah",
+  lastname: "Williams",
+  marks: [3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 3],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}, 
+{ 
+  name: "Olivia",
+  lastname: "Anderson",
+  marks: [4, 3, 4, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}, 
+{ 
+  name: "Sophia",
+  lastname: "Martin",
+  marks: [4, 3, 4, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4],
+  subjects: ["Math", "Science", "English", "History", "Geography"],
+  class: 4
+}])
+
+Выведите средний балл по всем предметам для каждого студента.
+db.students.aggregate([
+  {
+    $project: {
+      name: 1,
+      lastname: 1,
+      average_mark: { $avg: "$marks" }
+    }
+  }
+])
+
+Получите список студентов, у которых есть оценка ниже 3.
+db.students.aggregate([
+  {
+    $unwind: "$marks" 
+  },
+  {
+    $match: {
+      marks: { $lt: 3 }
+    }
+  },
+  {
+    $group: {
+      _id: "$_id", 
+      name: { $first: "$name" }, 
+      lastname: { $first: "$lastname" }, 
+      marks: { $push: "$marks" } 
+    }
+  }
+])
+
+Подсчитайте количество студентов в каждом классе.
+db.students.aggregate([
+  {
+    $sort: { class: 1 }
+  },
+  {
+    $group: {
+      _id: "$class",
+      count: { $sum: 1 }
+    }
+  }
+]);
+
+Рассчитайте суммарное количество оценок по каждому классу.
+db.students.aggregate([
+  {
+    $unwind: "$marks"
+  },
+  {
+    $group: {
+      _id: "$class",
+      totalMarks: { $sum: 1 }
+    }
+  }
+])
+
+Рассчитайте средний балл для каждого студента.
+db.students.aggregate([
+  {
+    $unwind: "$marks" 
+  },
+  {
+    $group: {
+      _id: "$_id", 
+      name: { $first: "$name" }, 
+      lastname: { $first: "$lastname" }, 
+      averageMark: { $avg: "$marks" } 
+    }
+  }
+])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

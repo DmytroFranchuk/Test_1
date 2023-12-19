@@ -1,0 +1,88 @@
+db.students.deleteMany({})
+
+Найти студентов с возрастом младше 22 лет
+Найти студентов с возрастом не более 22 
+лет и с оценкой выше 4:
+
+Найти студентов из города New-York с возрастом от 20 до 23 лет (включительно)
+db.students.find({ity: 'New-York', age: {$gte: 20, $lte:23}})
+
+Вывести студентов из Нью-Йорка, у которых возраст не входит в диапазон от 20 до 23 (концы исключаем)
+db.students.find({city: 'Bremen', $or: [{age: {$lt: 21}}, {age: { $gt: 23}}]})
+
+Найти студентов у которых есть оценка ниже 4 и городом не Berlin:
+db.students.find({marks: {$lt: 4}, city: {$ne: 'Berlin'}})
+
+Вывести имя и фамилию студентов, у которых оценки только 5 и 4
+db.students.find({marks: {$all: [6, 7]}})
+
+Агрегация по монго db
+Средний возраст по гендерам
+
+db.students.aggregate([{$group: {_id: '$gender', avgAge: {$avg: '$age'}}}])
+
+Найдите самого старшего студента в каждом городе
+Вывести город и возраст
+db.students.aggregate([{$group: {_id: '$city', maxAge: {$max: '$age'}}}])
+db.students.aggregate([{$group: {_id: null, maxAge: {$max: '$age'}}}])
+
+Найти средний возраст студентов в каждом городе у которых в оценках встречаются тройки
+db.students.aggregate([{$match: {marks: 3}}, {$group: {_id: 'city', avgAge: {$avg: '$age'}}}])
+Найти сумму возрастов у каждого пола
+db.students.aggregate([{$group: {_id: '$gender', sumAge: {$sum: "$age"}}}])
+
+Найти кол-во студентов каждого пола
+
+db.students.aggregate([{$group: {_id: '$gender', count: {$sum: 1}}}])
+
+1 - оставляем, 0 - убираем
+db.students.aggregate([{$project: {first_name: 1, last_name: 1, avgMark: {$avg: "$marks"}}} ])
+
+Для каждого студента найти максимальную, минимальную и среднюю оценку
+db.students.aggregate([{$project: {first_name: 1, last_name: 1, minMark: {$min: "$marks"}, maxMark: {$max: "$marks"}, avgMark: {$avg: "$marks"}}} ])
+
+db.students.aggregate([{$project: {_id: 0, minMark: {$min: "$marks"}, maxMark: {$max: "$marks"}, avgMark: {$avg: "$marks"}}} ])
+
+db.students.aggregate([{ $project: {_id: 1, marksStats: {avgMark: {$avg: "$marks"},maxMark: {$max: "$marks"},minMark: {$min: "$marks"}   }}} ])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Найти студентов с именем "Анна" или "Иван"
+db.students.find({first_name: {$in:['Анна', 'Иван']}})
+
+
+db.students.find({age: {$lte:22}})
+
+
+

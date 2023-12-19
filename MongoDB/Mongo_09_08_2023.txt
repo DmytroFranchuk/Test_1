@@ -1,0 +1,8 @@
+
+
+
+db.users_1.aggregate([ { $match: { country: 'USA' } } ])
+
+db.users_1.updateOne({_id: 1}, {$set: {balance: -100}})
+
+db.users_1.aggregate([{$match: {balance: {$lt: 0}}}])
