@@ -1,0 +1,15 @@
+1. создать бота в Телеграме, найти @BotFather, нажать START, написать команду /newbot -> следовать инструкциям
+2. дать имя этому боту -> <your name>_java_test_bot
+3. дать уникальное имя, по которому можно найти ьота — как username: <your name>_java_test_bot
+
+Это все. 
+
+You will find it at t.me/<your name>_java_test_bot.
+
+Use this token to access the HTTP API:
+<тут вы увидите токен, который желательно сохранить>
+Keep your token secure and store it safely, it can be used by anyone to control your bot.
+
+For a description of the Bot API, see this page: https://core.telegram.org/bots/api
+
+По username и token подключить бот к проекту.
